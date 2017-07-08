@@ -1,0 +1,22 @@
+## AssemblyLoadContext Tests
+A battery of tests that provide some insight into how AssemblyLoadContext (ALC) behaves. 
+### Function
+ALC allows for greater flexibility when dynamically loading assemblies. This is especially useful for plugins.  
+
+Consider the following situation:  
+- Assembly A references assembly B version 2.0.0  
+- Assembly C references assembly B version 1.0.0
+- Assembly C attempts to load assembly A and its dependencies dynamically  
+  - If Assembly C attempts to load assemblies A and B into the Default ALC, an exception will be thrown since assembly B already exists in the ALC.
+  - If Assembly C attempts to load assemblies A and B into a custom ALC, it will succeed. Assembly A and B can then be utilized using reflection (see tests for example).
+### Notes
+- Unlike AppDomains, passing objects over the boundary between two ALCs is trivial.
+- [Unloading of assemblies](https://github.com/dotnet/coreclr/pull/8677) is still a work in progress. For now, this makes ALC unsuitable for
+  many long running applications.
+
+### Additional Resources
+- Basic [documentation](https://github.com/guhuro/coreclr/blob/6fb56841617d1bb45782b690b232d966353e94bc/Documentation/design-docs/assemblyloadcontext.md) from the .Net team.
+- Relevant [Github issue](https://github.com/dotnet/coreclr/issues/6470).
+- [CoreCLR](https://github.com/dotnet/coreclr) ALC [native source](https://github.com/dotnet/coreclr/blob/13e7c4368da664a8b50228b1a5ef01a660fbb2dd/src/vm/assemblynative.cpp) and [managed wrapper](https://github.com/dotnet/coreclr/blob/b38113c80d04c39890207d149bf0359a86711d62/src/mscorlib/src/System/Runtime/Loader/AssemblyLoadContext.cs).
+- [CoreFX](https://github.com/dotnet/corefx) System.Runtime.Loader [source](https://github.com/dotnet/corefx/tree/f8db6ae1c5534e2d0060e2fbc19465c81bee3a82/src/System.Runtime.Loader). 
+  Exposes a subset of CoreCLR's ALC's members.
