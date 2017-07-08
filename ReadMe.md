@@ -13,10 +13,11 @@ Consider the following situation:
 - Unlike AppDomains, passing objects over the boundary between two ALCs is trivial.
 - [Unloading of assemblies](https://github.com/dotnet/coreclr/pull/8677) is still a work in progress. For now, this makes ALC unsuitable for
   many long running applications.
-
+- Since only one System.Private.CoreLib can exist and CoreFX mostly just [forwards](https://docs.microsoft.com/en-us/dotnet/framework/app-domains/type-forwarding-in-the-common-language-runtime) types to it,
+  loading different versions of CoreFX packages may not work as expected.
 ### Additional Resources
 - Basic [documentation](https://github.com/guhuro/coreclr/blob/6fb56841617d1bb45782b690b232d966353e94bc/Documentation/design-docs/assemblyloadcontext.md) from the .Net team.
 - Relevant [Github issue](https://github.com/dotnet/coreclr/issues/6470).
-- [CoreCLR](https://github.com/dotnet/coreclr) ALC [native source](https://github.com/dotnet/coreclr/blob/13e7c4368da664a8b50228b1a5ef01a660fbb2dd/src/vm/assemblynative.cpp) and [managed wrapper](https://github.com/dotnet/coreclr/blob/b38113c80d04c39890207d149bf0359a86711d62/src/mscorlib/src/System/Runtime/Loader/AssemblyLoadContext.cs).
-- [CoreFX](https://github.com/dotnet/corefx) System.Runtime.Loader [source](https://github.com/dotnet/corefx/tree/f8db6ae1c5534e2d0060e2fbc19465c81bee3a82/src/System.Runtime.Loader). 
+- CoreCLR ALC [native source](https://github.com/dotnet/coreclr/blob/13e7c4368da664a8b50228b1a5ef01a660fbb2dd/src/vm/assemblynative.cpp) and [managed wrapper](https://github.com/dotnet/coreclr/blob/b38113c80d04c39890207d149bf0359a86711d62/src/mscorlib/src/System/Runtime/Loader/AssemblyLoadContext.cs).
+- CoreFX System.Runtime.Loader [source](https://github.com/dotnet/corefx/tree/f8db6ae1c5534e2d0060e2fbc19465c81bee3a82/src/System.Runtime.Loader). 
   Exposes a subset of CoreCLR's ALC's members.
