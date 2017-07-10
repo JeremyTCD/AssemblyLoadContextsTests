@@ -43,7 +43,7 @@ namespace AssemblyLoadContextTests
             string assemblyV2Path = $"{solutionDir}{projectAndAssemblyName}/bin/artifacts2/{projectAndAssemblyName}.dll";
 
             // Act and Assert
-            Assembly assemblyV1 = Assembly.Load(projectAndAssemblyName);
+            Assembly assemblyV1 = Assembly.Load(new AssemblyName(projectAndAssemblyName));
             Assert.Equal("1.0.0.0", assemblyV1.GetName().Version.ToString());
             Assert.Throws<FileLoadException>(() => AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyV2Path));
         }
@@ -66,7 +66,7 @@ namespace AssemblyLoadContextTests
             AssemblyLoadContext loadContext = new BasicAssemblyLoadContext();
 
             // Act 
-            Assembly assemblyV1 = Assembly.Load(projectAndAssemblyName);
+            Assembly assemblyV1 = Assembly.Load(new AssemblyName(projectAndAssemblyName));
             Assembly assemblyV2 = loadContext.LoadFromAssemblyPath(assemblyV2Path);
 
             // Assert
