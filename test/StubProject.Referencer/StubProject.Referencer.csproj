@@ -2,7 +2,10 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.1</TargetFramework>
-    <OutDir>bin/artifacts</OutDir>
   </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\StubProject.Referencee\StubProject.Referencee.csproj" />
+  </ItemGroup>
 
 </Project>

@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard1.1</TargetFramework>
-    <OutDir>bin/artifacts</OutDir>
   </PropertyGroup>
 
 </Project>
