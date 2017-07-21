@@ -17,6 +17,8 @@ Consider the following situation:
   many long running applications.
 - Since only one System.Private.CoreLib can exist and CoreFX mostly just [forwards](https://docs.microsoft.com/en-us/dotnet/framework/app-domains/type-forwarding-in-the-common-language-runtime) types to it,
   loading different versions of CoreFX packages may not work as expected.
+- Apart from System.Private.CoreLib, an entire framework can be loaded in an ALC. It is a good idea to load all framework assemblies, not a subset. Consider System.Runtime.dll version 4.1.1, it forwards some classes
+  mscorlib.dll. mscorlib.dll version 4.0.0 in turn, forwards some classes to System.Runtime.dll. If these two assemblies are loaded at the same time, circular forwarding occurs and the program fails to run.
 ### ALC Additional Resources
 - Basic [documentation](https://github.com/guhuro/coreclr/blob/6fb56841617d1bb45782b690b232d966353e94bc/Documentation/design-docs/assemblyloadcontext.md) from the .Net team.
 - Relevant [Github issue](https://github.com/dotnet/coreclr/issues/6470).
