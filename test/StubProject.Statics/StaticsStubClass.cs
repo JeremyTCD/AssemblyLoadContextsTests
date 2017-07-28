@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StubProject.Statics
+﻿namespace StubProject.Statics
 {
     public class StaticsStubClass
     {

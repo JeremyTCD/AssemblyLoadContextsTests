@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace StubProject.InstanceMethod
+﻿namespace StubProject.InstanceMethod
 {
     public class InstanceMethodStubClass
     {
