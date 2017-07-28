@@ -27,6 +27,43 @@ namespace AssemblyLoadContextTests
         }
 
         /// <summary>
+        /// Propogates exceptions across context coundaries.
+        /// 
+        /// Note that the <see cref="Exception"/> type is defined in System.Private.Corlib. Since only one System.Private.Corlib
+        /// assembly can be loaded in a process, types defined by it can be passed across boundaries.
+        /// </summary>
+        [Fact]
+        public void AssemblyLoadContext_PropagatesExceptionsAcrossContextBoundaries()
+        {
+            // Arrange
+            string solutionDir = Path.GetFullPath(typeof(AssemblyLoadContextTests).GetTypeInfo().Assembly.Location + "../../../../../../..");
+            string projectAndAssemblyName = "StubProject.ThrowsException";
+            string assemblyPath = $"{solutionDir}/test/{projectAndAssemblyName}/bin/debug/netstandard2.0/{projectAndAssemblyName}.dll";
+            string testExceptionMessage = "testExceptionMessage";
+
+            BasicAssemblyLoadContext loadContext = new BasicAssemblyLoadContext();
+            Assembly assembly = loadContext.LoadFromAssemblyPath(assemblyPath);
+            Type throwsExceptionStubClass = assembly.GetTypes().First();
+            object throwsExceptionStubClassInstance = Activator.CreateInstance(throwsExceptionStubClass);
+            MethodInfo method = throwsExceptionStubClass.GetMethod("ThrowException", BindingFlags.Instance | BindingFlags.Public);
+
+            // Act
+            Exception result = null; 
+            try
+            {
+                method.Invoke(throwsExceptionStubClassInstance, new object[] { testExceptionMessage });
+            }
+            catch(Exception exception)
+            {
+                result = exception;
+            }
+
+            // Assert
+            Assert.NotNull(result);
+            Assert.Equal(testExceptionMessage, result.InnerException.Message);
+        }
+
+        /// <summary>
         /// Does not allow loading of different versions of an assembly into context - throws an exception, doesn't
         /// overwrite initial load.
         /// 
@@ -68,7 +105,7 @@ namespace AssemblyLoadContextTests
 
             _msBuildService.Build(projectFile, $"/t:build /p:OutDir={_tempDir},AssemblyVersion=2.0.0.0");  // TODO netstandard2.0 and earlier, AssemblyLoadContexts cannot be unloaded
             string assemblyV2Path = $"{_tempDir}/{projectAndAssemblyName}.dll";
-            AssemblyLoadContext loadContext = new BasicAssemblyLoadContext();
+            BasicAssemblyLoadContext loadContext = new BasicAssemblyLoadContext();
 
             // Act 
             Assembly assemblyV1 = AssemblyLoadContext.Default.LoadFromAssemblyPath(assemblyV1Path);
@@ -82,7 +119,9 @@ namespace AssemblyLoadContextTests
         /// <summary>
         /// Instances of a type from the same assembly but different contexts cannot be used interchangeably
         /// 
-        /// The standard way of passing data across context boundaries is through marshalling.
+        /// The standard way of passing data across context boundaries is through marshalling. Marshalling can be done by serializing
+        /// as json or xml. Note that type defined in System.Private.Corelib such as string and exception can be passed across 
+        /// context boundaries. This is since only one System.Private.Corelib assembly can be loaded in a process.
         /// </summary>
         [Fact]
         public void AssemblyLoadContext_InstancesOfATypeFromTheSameAssemblyInDifferentContextsCannotBeUsedInterchangeably()
@@ -116,7 +155,6 @@ namespace AssemblyLoadContextTests
             // Arrange
             string solutionDir = Path.GetFullPath(typeof(AssemblyLoadContextTests).GetTypeInfo().Assembly.Location + "../../../../../../..");
             string projectAndAssemblyName = "StubProject.InstanceMethod";
-            string projectFile = $"{solutionDir}/test/{projectAndAssemblyName}/{projectAndAssemblyName}.csproj";
             string assemblyPath = $"{solutionDir}/test/{projectAndAssemblyName}/bin/debug/netstandard2.0/{projectAndAssemblyName}.dll";
             string testString = "testString";
 
